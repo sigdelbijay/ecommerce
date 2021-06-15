@@ -95,12 +95,12 @@ exports.update = (req, res) => {
     }
 
     //check for all fields
-    const { name, description, price, category, quantity, photo } = fields
-    if (!name || !description || !price || !category || !quantity) {
-      return res.status(400).json({
-        error: 'All fields are required'
-      })
-    }
+    // const { name, description, price, category, quantity, photo } = fields
+    // if (!name || !description || !price || !category || !quantity) {
+    //   return res.status(400).json({
+    //     error: 'All fields are required'
+    //   })
+    // }
 
     let product = req.product
     //replace existing fields with new fields
@@ -121,7 +121,7 @@ exports.update = (req, res) => {
           error: errorHandler(err)
         })
       }
-      res.json({result})
+      res.json(result)
     })
   })
 }
@@ -260,4 +260,24 @@ exports.listSearch = (req, res, next) => {
       res.json(products)
     }).select('-photo')
   }
+}
+
+exports.decreaseQuantity = (req, res, next) => {
+  let bulkOps = req.body.order.products.map((product) => {
+    return {
+      updateOne: {
+        filter: { _id: product._id },
+        update: {$inc: {quantity: -product.count, sold: +product.count}}
+      }
+    }
+  })
+
+  Product.bulkWrite(bulkOps, {}, (err, data) => {
+    if (err) {
+      return res.status(400).json({
+        error: 'Could not update product'
+      })
+    }
+    next()
+  })
 }

@@ -55,7 +55,7 @@ exports.requireSignin = expressJwt({
 });
 
 exports.isAuth = (req, res, next) => {
-  // console.log("req.auth", req.auth)
+  console.log("req.auth", req.auth)
   // console.log("req.profile", req.profile)
   let user = req.profile && req.auth && req.profile._id == req.auth._id //if the userId it is trying to access and the logged in user is the same
   if (!user) {
